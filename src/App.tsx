@@ -3,8 +3,11 @@ import { ControlPanel } from './components/ControlPanel';
 import { GameSummary } from './components/GameSummary';
 import { MoveHistory } from './components/MoveHistory';
 import { PromotionDialog } from './components/PromotionDialog';
+import { STATUS_LABEL } from './constants/status';
+import { useChessStore } from './state/chessStore';
 
 export default function App() {
+  const status = useChessStore((state) => state.status);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 pb-20 text-slate-100">
@@ -25,6 +28,10 @@ export default function App() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-sm">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 font-semibold text-emerald-200">
+            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
+            {STATUS_LABEL[status] ?? status}
+          </span>
           <a
             href="https://github.com/mslwood/chess-game"
             className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 font-semibold text-slate-100 transition hover:border-slate-500 hover:text-white"

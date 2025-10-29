@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { useMemo } from 'react';
 import { popCount } from '../engine/bitboard';
 import { Color, Piece, PIECES } from '../engine/types';
+import { STATUS_LABEL } from '../constants/status';
 import { useChessStore } from '../state/chessStore';
 
 const INITIAL_PIECE_COUNTS: Record<Color, Record<Piece, number>> = {
@@ -40,14 +41,6 @@ const PIECE_GLYPHS: Record<Color, Record<Piece, string>> = {
     [Piece.Queen]: '♛',
     [Piece.King]: '♚'
   }
-};
-
-const STATUS_LABEL: Record<string, string> = {
-  ongoing: 'Game in progress',
-  checkmate: 'Checkmate',
-  stalemate: 'Stalemate',
-  'fifty-move': 'Draw · 50-move rule',
-  threefold: 'Draw · Repetition'
 };
 
 export function GameSummary() {
