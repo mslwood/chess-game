@@ -22,8 +22,8 @@ export const SquareTile = memo(function SquareTile({ square, isLight, highlighte
       type="button"
       onClick={onClick}
       className={clsx(
-        'relative aspect-square focus:outline-none',
-        isLight ? 'bg-board-light/95' : 'bg-board-dark/95',
+        'relative aspect-square transition-colors duration-150 focus:outline-none',
+        isLight ? 'bg-board-light/95 hover:bg-board-light/80' : 'bg-board-dark/95 hover:bg-board-dark/80',
         highlighted && 'after:absolute after:inset-3 after:rounded-full after:bg-emerald-400/70 after:content-[""]',
         selected && 'ring-4 ring-emerald-400/50',
         isOver && 'ring-4 ring-emerald-400/80'
