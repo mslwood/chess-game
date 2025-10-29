@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist/node",
+    "module": "ESNext"
+  },
+  "include": [
+    "vite.config.ts",
+    "vitest.config.ts",
+    "jest.config.ts",
+    "tailwind.config.ts",
+    "scripts/**/*.ts",
+    "src/engine/**/*.ts",
+    "src/utils/**/*.ts",
+    "src/state/**/*.ts"
+  ]
+}
