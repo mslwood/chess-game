@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { STATUS_LABEL } from '../constants/status';
 import { useChessStore } from '../state/chessStore';
-
-const statusLabel: Record<string, string> = {
-  ongoing: 'Game in progress',
-  checkmate: 'Checkmate',
-  stalemate: 'Stalemate',
-  'fifty-move': 'Draw · 50-move rule',
-  threefold: 'Draw · Repetition'
-};
 
 export function ControlPanel() {
   const { chess, snapshot, status, undo, redo, reset, runAI, loadPGN, loadFEN, aiThinking } = useChessStore((state) => ({
@@ -36,7 +29,7 @@ export function ControlPanel() {
       <div className="flex items-center justify-between rounded-3xl border border-slate-800/80 bg-slate-950/40 p-5 backdrop-blur">
         <div>
           <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Status</h2>
-          <p className="text-base font-semibold text-slate-100">{statusLabel[status] ?? status}</p>
+          <p className="text-base font-semibold text-slate-100">{STATUS_LABEL[status] ?? status}</p>
         </div>
         <button
           type="button"
