@@ -1,12 +1,15 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useChessStore } from '../state/chessStore';
 import { PieceSvg } from './PieceSvg';
 
 export function PromotionDialog() {
-  const { pendingPromotion, choosePromotion, selectSquare } = useChessStore((state) => ({
-    pendingPromotion: state.pendingPromotion,
-    choosePromotion: state.choosePromotion,
-    selectSquare: state.selectSquare
-  }));
+  const { pendingPromotion, choosePromotion, selectSquare } = useChessStore(
+    useShallow((state) => ({
+      pendingPromotion: state.pendingPromotion,
+      choosePromotion: state.choosePromotion,
+      selectSquare: state.selectSquare
+    }))
+  );
 
   if (!pendingPromotion) return null;
 

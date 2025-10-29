@@ -1,20 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { STATUS_LABEL } from '../constants/status';
 import { useChessStore } from '../state/chessStore';
 
 export function ControlPanel() {
-  const { chess, snapshot, status, undo, redo, reset, runAI, loadPGN, loadFEN, aiThinking } = useChessStore((state) => ({
-    chess: state.chess,
-    snapshot: state.snapshot,
-    status: state.status,
-    undo: state.undo,
-    redo: state.redo,
-    reset: state.reset,
-    runAI: state.runAI,
-    loadPGN: state.loadPGN,
-    loadFEN: state.loadFEN,
-    aiThinking: state.aiThinking
-  }));
+  const { chess, snapshot, status, undo, redo, reset, runAI, loadPGN, loadFEN, aiThinking } = useChessStore(
+    useShallow((state) => ({
+      chess: state.chess,
+      snapshot: state.snapshot,
+      status: state.status,
+      undo: state.undo,
+      redo: state.redo,
+      reset: state.reset,
+      runAI: state.runAI,
+      loadPGN: state.loadPGN,
+      loadFEN: state.loadFEN,
+      aiThinking: state.aiThinking
+    }))
+  );
 
   const fen = useMemo(() => chess.toFEN(snapshot), [chess, snapshot]);
   const [fenInput, setFenInput] = useState(fen);
