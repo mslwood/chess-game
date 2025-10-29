@@ -20,6 +20,8 @@ export interface ChessStoreState {
   status: 'ongoing' | 'checkmate' | 'stalemate' | 'fifty-move' | 'threefold';
   aiThinking: boolean;
   pendingPromotion: PromotionRequest | null;
+  evaluation: number;
+  lastSearch: SearchSummary | null;
   selectSquare: (square: number) => void;
   playMove: (move: MoveWithNotation) => void;
   choosePromotion: (promotion: MoveWithNotation) => void;
@@ -31,14 +33,24 @@ export interface ChessStoreState {
   runAI: (depth?: number, timeLimitMs?: number) => Promise<void>;
 }
 
+export interface SearchSummary {
+  depth: number;
+  evaluation: number;
+  nodes: number;
+  durationMs: number;
+}
+
 const engine = new Chess(START_FEN);
+const initial = snapshot(engine);
 
 function snapshot(chess: Chess) {
+  const state = chess.getState();
   return {
-    snapshot: chess.getState(),
-    legalMoves: chess.generateLegalMoves(),
+    snapshot: state,
+    legalMoves: chess.generateLegalMoves(state),
     moves: chess.getMoveHistory(),
-    status: chess.getGameStatus()
+    status: chess.getGameStatus(),
+    evaluation: chess.evaluate(state)
   };
 }
 
@@ -56,14 +68,16 @@ function isOwnPiece(state: GameStateSnapshot, square: number): boolean {
 export const useChessStore = create<ChessStoreState>()(
   immer((set, get) => ({
     chess: engine,
-    snapshot: engine.getState(),
-    legalMoves: engine.generateLegalMoves(),
-    moves: engine.getMoveHistory(),
+    snapshot: initial.snapshot,
+    legalMoves: initial.legalMoves,
+    moves: initial.moves,
     selectedSquare: null,
     highlightSquares: [],
-    status: engine.getGameStatus(),
+    status: initial.status,
     aiThinking: false,
     pendingPromotion: null,
+    evaluation: initial.evaluation,
+    lastSearch: null,
     selectSquare: (square) => {
       const { selectedSquare, snapshot: state, legalMoves } = get();
       if (selectedSquare === null) {
@@ -124,6 +138,8 @@ export const useChessStore = create<ChessStoreState>()(
         draft.legalMoves = next.legalMoves;
         draft.moves = next.moves;
         draft.status = next.status;
+        draft.evaluation = next.evaluation;
+        draft.lastSearch = null;
       });
     },
     choosePromotion: (promotion) => {
@@ -141,6 +157,8 @@ export const useChessStore = create<ChessStoreState>()(
         draft.legalMoves = next.legalMoves;
         draft.moves = next.moves;
         draft.status = next.status;
+        draft.evaluation = next.evaluation;
+        draft.lastSearch = null;
       });
     },
     undo: () => {
@@ -155,6 +173,8 @@ export const useChessStore = create<ChessStoreState>()(
         draft.legalMoves = next.legalMoves;
         draft.moves = next.moves;
         draft.status = next.status;
+        draft.evaluation = next.evaluation;
+        draft.lastSearch = null;
       });
     },
     redo: () => {
@@ -169,6 +189,8 @@ export const useChessStore = create<ChessStoreState>()(
         draft.legalMoves = next.legalMoves;
         draft.moves = next.moves;
         draft.status = next.status;
+        draft.evaluation = next.evaluation;
+        draft.lastSearch = null;
       });
     },
     loadPGN: (pgn: string) => {
@@ -183,6 +205,8 @@ export const useChessStore = create<ChessStoreState>()(
         draft.legalMoves = next.legalMoves;
         draft.moves = next.moves;
         draft.status = next.status;
+        draft.evaluation = next.evaluation;
+        draft.lastSearch = null;
       });
     },
     loadFEN: (fen: string) => {
@@ -197,6 +221,8 @@ export const useChessStore = create<ChessStoreState>()(
         draft.legalMoves = next.legalMoves;
         draft.moves = next.moves;
         draft.status = next.status;
+        draft.evaluation = next.evaluation;
+        draft.lastSearch = null;
       });
     },
     runAI: async (depth = 4, timeLimitMs = 2500) => {
@@ -205,6 +231,7 @@ export const useChessStore = create<ChessStoreState>()(
         draft.aiThinking = true;
       });
       try {
+        const startedAt = Date.now();
         const result = chess.search(depth, timeLimitMs);
         if (result.bestMove) {
           chess.makeMove(result.bestMove);
@@ -218,6 +245,13 @@ export const useChessStore = create<ChessStoreState>()(
           draft.selectedSquare = null;
           draft.highlightSquares = [];
           draft.pendingPromotion = null;
+          draft.evaluation = next.evaluation;
+          draft.lastSearch = {
+            depth: result.depth,
+            evaluation: result.evaluation,
+            nodes: result.nodes,
+            durationMs: Date.now() - startedAt
+          };
         });
       } finally {
         set((draft) => {
