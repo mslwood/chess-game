@@ -1,17 +1,20 @@
 import { DndContext, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { useCallback, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useChessStore } from '../state/chessStore';
 import { extractPieces, isLightSquare } from '../utils/board';
 import { SquareTile } from './SquareTile';
 import { PieceDraggable } from './PieceDraggable';
 
 export function ChessBoard() {
-  const { snapshot, selectSquare, highlightSquares, selectedSquare } = useChessStore((state) => ({
-    snapshot: state.snapshot,
-    selectSquare: state.selectSquare,
-    highlightSquares: state.highlightSquares,
-    selectedSquare: state.selectedSquare
-  }));
+  const { snapshot, selectSquare, highlightSquares, selectedSquare } = useChessStore(
+    useShallow((state) => ({
+      snapshot: state.snapshot,
+      selectSquare: state.selectSquare,
+      highlightSquares: state.highlightSquares,
+      selectedSquare: state.selectedSquare
+    }))
+  );
 
   const pieces = useMemo(() => extractPieces(snapshot), [snapshot]);
   const boardSquares = useMemo(() => Array.from({ length: 64 }, (_, index) => 63 - index), []);

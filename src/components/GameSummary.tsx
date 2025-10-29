@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { popCount } from '../engine/bitboard';
 import { Color, Piece, PIECES } from '../engine/types';
 import { STATUS_LABEL } from '../constants/status';
@@ -44,11 +45,13 @@ const PIECE_GLYPHS: Record<Color, Record<Piece, string>> = {
 };
 
 export function GameSummary() {
-  const { snapshot, moves, status } = useChessStore((state) => ({
-    snapshot: state.snapshot,
-    moves: state.moves,
-    status: state.status
-  }));
+  const { snapshot, moves, status } = useChessStore(
+    useShallow((state) => ({
+      snapshot: state.snapshot,
+      moves: state.moves,
+      status: state.status
+    }))
+  );
 
   const info = useMemo(() => {
     const currentCounts: Record<Color, Record<Piece, number>> = {
